@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Luyện Nói Trung" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Tiếng Trung Giao Tiếp AI</title>
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ef4444'/%3E%3Cstop offset='100%25' stop-color='%23b91c1c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23g)'/%3E%3Ctext x='90' y='118' font-size='88' text-anchor='middle' fill='%23fef08a' font-family='PingFang SC, sans-serif' font-weight='bold'%3E说%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #131c31;
+      --surface-2: #1e293b;
+      --border: rgba(148, 163, 184, 0.16);
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --accent: #ef4444;
+      --accent-glow: rgba(239, 68, 68, 0.35);
+      --gold: #fbbf24;
+      --green: #10b981;
+      --blue: #38bdf8;
+      --safe-top: env(safe-area-inset-top, 12px);
+      --safe-bottom: env(safe-area-inset-bottom, 12px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      height: 100dvh;
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--bg);
+    }
+
+    /* Header */
+    header {
+      padding-top: calc(var(--safe-top) + 8px);
+      padding-bottom: 10px;
+      padding-left: 14px;
+      padding-right: 14px;
+      background: rgba(19, 28, 49, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      z-index: 20;
+      flex-shrink: 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fef08a;
+      font-weight: 800;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .brand-info {
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .icon-btn.active {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      margin-top: 9px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .toolbar::-webkit-scrollbar { display: none; }
+
+    .chip-select, .chip-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .chip-btn.on {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+    }
+
+    .chip-btn.call-on {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+    }
+
+    /* Chat Area */
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%;
+      animation: fadeUp 0.18s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .msg.ai {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .bubble {
+      padding: 11px 14px;
+      border-radius: 18px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg.user .bubble {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+      font-size: 16px;
+    }
+
+    .msg.ai .bubble {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 5px;
+      width: 100%;
+    }
+
+    .cn-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+      font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    }
+
+    .py-text {
+      font-size: 13px;
+      color: #93c5fd;
+      margin-top: 4px;
+    }
+
+    .vi-text {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.18);
+    }
+
+    .hide-py .py-text { display: none; }
+    .hide-vi .vi-text { display: none; }
+
+    .msg-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mini-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .mini-btn:active {
+      transform: scale(0.96);
+    }
+
+    .mini-btn.speaking {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(251, 191, 36, 0.12);
+    }
+
+    .coach-tip {
+      margin-top: 6px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      color: #fde68a;
+      font-size: 12.5px;
+      padding: 8px 11px;
+      border-radius: 12px;
+      line-height: 1.45;
+    }
+
+    /* Suggestions Drawer */
+    #suggestions-box {
+      display: none;
+      padding: 8px 14px;
+      background: rgba(19, 28, 49, 0.96);
+      border-top: 1px solid var(--border);
+      gap: 6px;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    #suggestions-box.show {
+      display: flex;
+    }
+
+    .sug-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 12px;
+      text-align: left;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .sug-cn { font-size: 14px; font-weight: 600; }
+    .sug-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+
+    /* Live interim banner */
+    #live-banner {
+      display: none;
+      padding: 8px 14px;
+      background: rgba(239, 68, 68, 0.15);
+      border-top: 1px solid rgba(239, 68, 68, 0.35);
+      font-size: 14px;
+      color: #fecaca;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    #live-banner.show {
+      display: flex;
+    }
+
+    /* Footer / Controls */
+    footer {
+      background: rgba(19, 28, 49, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 10px 12px calc(var(--safe-bottom) + 8px);
+      flex-shrink: 0;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #text-input {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 16px; /* Prevents iOS Safari auto-zoom */
+      outline: none;
+      min-width: 0;
+    }
+
+    #text-input::placeholder {
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    .circle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+
+    .circle-btn:active { transform: scale(0.92); }
+
+    #sug-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+    }
+
+    #send-btn {
+      background: #2563eb;
+      color: #fff;
+      display: none;
+    }
+
+    #mic-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      width: 48px;
+      height: 48px;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    #mic-btn.recording {
+      background: #10b981;
+      box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.22);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+      70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .hint-bar {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 86dvh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .modal p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 12px;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .secondary-btn {
+      width: 100%;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 11px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    .tip-box {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #bae6fd;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .typing-dots span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      margin: 0 2px;
+      animation: bounce 1.1s infinite ease-in-out;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app-root">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <div class="avatar">林</div>
+          <div class="brand-info">
+            <div class="brand-title">Lâm Hiểu (林晓) <span class="status-dot"></span></div>
+            <div class="brand-sub" id="voice-badge">Giọng bản xứ • Phản hồi tức thì</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="reset-btn" title="Cuộc trò chuyện mới">🔄 Mới</button>
+          <button class="icon-btn" id="settings-btn" title="Cài đặt">⚙️ Cài đặt</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <select class="chip-select" id="topic-select" aria-label="Chủ đề">
+          <option value="Đời thường & Bạn bè thân thiết (tán gẫu, ăn uống, cuối tuần)">💬 Đời thường</option>
+          <option value="Công việc văn phòng, nhà máy, kỹ thuật và phối hợp đồng nghiệp">🏭 Công việc / Kỹ thuật</option>
+          <option value="Du lịch, gọi món nhà hàng, hỏi đường, mua sắm">🍜 Ăn uống & Du lịch</option>
+          <option value="Giao tiếp cơ bản chậm rãi cho người mới bắt đầu (HSK 1-2)">🌱 Cơ bản (Chậm)</option>
+          <option value="Tranh luận chủ đề xã hội, phim ảnh, công nghệ (HSK 4-6)">🔥 Nâng cao</option>
+        </select>
+
+        <button class="chip-btn on" id="toggle-py">Pinyin</button>
+        <button class="chip-btn on" id="toggle-vi">Dịch</button>
+        <button class="chip-btn" id="toggle-call">📞 Tự nghe tiếp</button>
+      </div>
+    </header>
+
+    <main id="chat"></main>
+
+    <div id="suggestions-box"></div>
+
+    <div id="live-banner">
+      <span id="live-text">🎙️ Đang nghe tiếng Trung của bạn...</span>
+      <button class="mini-btn" id="stop-mic-btn">Xong</button>
+    </div>
+
+    <footer>
+      <div class="input-row">
+        <button class="circle-btn" id="sug-btn" title="Gợi ý câu trả lời">✨</button>
+        <input
+          type="text"
+          id="text-input"
+          placeholder="Nói hoặc gõ tiếng Trung / Việt..."
+          autocomplete="off"
+          enterkeyhint="send"
+        />
+        <button class="circle-btn" id="send-btn" title="Gửi">➤</button>
+        <button class="circle-btn" id="mic-btn" title="Bấm để nói tiếng Trung">🎙️</button>
+      </div>
+      <div class="hint-bar" id="hint-bar">Bấm 🎙️ để nói, hoặc bấm vào ô chữ dùng micro bàn phím iPhone</div>
+    </footer>
+  </div>
+
+  <!-- Settings / API Key Modal -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal">
+      <h2>⚙️ Cài đặt Trợ lý Bản xứ</h2>
+      <p>Khóa API được lưu trực tiếp trên iPhone của bạn, giúp kết nối thẳng tới Google Gemini với tốc độ nhanh nhất.</p>
+
+      <div class="field">
+        <label for="api-key-input">1. Google Gemini API Key (Miễn phí)</label>
+        <input type="password" id="api-key-input" placeholder="Dán mã AIzaSy... vào đây" />
+      </div>
+
+      <div class="tip-box">
+        <strong>Chưa có mã?</strong> Mở <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#38bdf8;font-weight:700;">aistudio.google.com/apikey</a> → Đăng nhập Gmail → Bấm <b>Create API key</b> → Sao chép và dán vào ô trên.
+      </div>
+
+      <div class="field">
+        <label for="voice-select">2. Giọng đọc tiếng Trung (iPhone)</label>
+        <select id="voice-select"></select>
+      </div>
+
+      <div class="field">
+        <label for="rate-select">3. Tốc độ nói của người bản xứ</label>
+        <select id="rate-select">
+          <option value="0.82">0.8x — Chậm rãi, rõ từng chữ</option>
+          <option value="0.98" selected>1.0x — Tự nhiên như người Trung nói</option>
+          <option value="1.15">1.15x — Nhanh như nói chuyện hàng ngày</option>
+        </select>
+      </div>
+
+      <div class="tip-box" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.28);color:#a7f3d0;">
+        💡 <b>Mẹo giọng hay như người thật trên iPhone:</b> Vào <i>Cài đặt iPhone → Trợ năng → Nội dung được đọc → Giọng nói → Tiếng Trung (Trung Quốc)</i> và tải bản <b>Tingting (Nâng cao)</b> hoặc <b>Lili (Nâng cao)</b>. App sẽ tự động nhận giọng này!
+      </div>
+
+      <button class="primary-btn" id="save-settings-btn">Lưu & Bắt đầu nói chuyện</button>
+      <button class="secondary-btn" id="test-voice-btn">🔊 Nghe thử giọng đọc</button>
+      <button class="secondary-btn" id="close-settings-btn">Đóng</button>
+    </div>
+  </div>
+
+  <script>
+    // ====== STATE & STORAGE ======
+    const STORAGE_KEY = 'cn_partner_v3';
+    const state = {
+      apiKey: '',
+      voiceURI: '',
+      rate: 0.98,
+      showPy: true,
+      showVi: true,
+      autoCall: false,
+      topic: 'Đời thường & Bạn bè thân thiết (tán gẫu, ăn uống, cuối tuần)',
+      history: [],
+      isRecording: false,
+      isGenerating: false,
+      audioUnlocked: false,
+      activeModel: 'gemini-3.8-flash'
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      Object.assign(state, saved);
+    } catch (e) {}
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        apiKey: state.apiKey,
+        voiceURI: state.voiceURI,
+        rate: state.rate,
+        showPy: state.showPy,
+        showVi: state.showVi,
+        autoCall: state.autoCall,
+        topic: state.topic,
+        activeModel: state.activeModel
+      }));
+    }
+
+    // ====== DOM ELEMENTS ======
+    const appRoot = document.getElementById('app-root');
+    const chatEl = document.getElementById('chat');
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const sugBtn = document.getElementById('sug-btn');
+    const suggestionsBox = document.getElementById('suggestions-box');
+    const liveBanner = document.getElementById('live-banner');
+    const liveText = document.getElementById('live-text');
+    const stopMicBtn = document.getElementById('stop-mic-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const voiceSelect = document.getElementById('voice-select');
+    const rateSelect = document.getElementById('rate-select');
+    const voiceBadge = document.getElementById('voice-badge');
+    const topicSelect = document.getElementById('topic-select');
+
+    // ====== iOS AUDIO UNLOCK & NATIVE CHINESE TTS ======
+    let availableVoices = [];
+
+    function unlockIOSAudio() {
+      if (state.audioUnlocked) return;
+      state.audioUnlocked = true;
+      try {
+        const u = new SpeechSynthesisUtterance('');
+        u.volume = 0;
+        window.speechSynthesis.speak(u);
+      } catch (e) {}
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          if (ctx.state === 'suspended') ctx.resume();
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('touchstart', unlockIOSAudio, { once: true, passive: true });
+    document.addEventListener('click', unlockIOSAudio, { once: true });
+
+    function loadChineseVoices() {
+      const all = window.speechSynthesis.getVoices() || [];
+      const zh = all.filter(v =>
+        v.lang.toLowerCase().includes('zh') ||
+        v.lang.toLowerCase().includes('cmn') ||
+        /ting|lili|shanshan|xiaoxiao|yunxi|meijia|sinji|chinese/i.test(v.name)
+      );
+
+      // Rank Mainland Mandarin voices highest
+      zh.sort((a, b) => {
+        const score = (v) => {
+          let s = 0;
+          if (/zh-CN|zh_CN/i.test(v.lang)) s += 50;
+          if (/enhanced|premium|siri|natural|neural/i.test(v.name)) s += 30;
+          if (/tingting|lili|shanshan|xiaoxiao|yunxi/i.test(v.name)) s += 20;
+          if (/zh-HK|zh-TW/i.test(v.lang)) s -= 15;
+          return s;
+        };
+        return score(b) - score(a);
+      });
+
+      availableVoices = zh;
+      voiceSelect.innerHTML = '';
+
+      if (zh.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Giọng tiếng Trung mặc định (zh-CN)';
+        voiceSelect.appendChild(opt);
+      } else {
+        zh.forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v.voiceURI;
+          opt.textContent = `${v.name} (${v.lang})`;
+          voiceSelect.appendChild(opt);
+        });
+        if (!state.voiceURI || !zh.some(v => v.voiceURI === state.voiceURI)) {
+          state.voiceURI = zh[0].voiceURI;
+        }
+        voiceSelect.value = state.voiceURI;
+        const chosen = zh.find(v => v.voiceURI === state.voiceURI) || zh[0];
+        voiceBadge.textContent = `Giọng: ${chosen.name.split(' ')[0]} • Siêu tốc`;
+      }
+    }
+
+    loadChineseVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadChineseVoices;
+    }
+
+    function speakChinese(text, btnEl = null, onDone = null) {
+      if (!text) return;
+      unlockIOSAudio();
+      window.speechSynthesis.cancel();
+
+      document.querySelectorAll('.mini-btn.speaking').forEach(b => b.classList.remove('speaking'));
+      if (btnEl) btnEl.classList.add('speaking');
+
+      // Clean out emojis or stage directions before speaking
+      const clean = text.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').replace(/\(.*?\)|（.*?）/g, '').trim();
+      if (!clean) {
+        if (btnEl) btnEl.classList.remove('speaking');
+        if (onDone) onDone();
+        return;
+      }
+
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.lang = 'zh-CN';
+      utter.rate = Number(state.rate) || 0.98;
+      utter.pitch = 1.02;
+
+      const selected = availableVoices.find(v => v.voiceURI === state.voiceURI) || availableVoices[0];
+      if (selected) utter.voice = selected;
+
+      // iOS Safari workaround: keep synthesis alive for longer sentences
+      let keepAlive = setInterval(() => {
+        if (!window.speechSynthesis.speaking) {
+          clearInterval(keepAlive);
+        } else {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }
+      }, 10000);
+
+      utter.onend = () => {
+        clearInterval(keepAlive);
+        if (btnEl) btnEl.classList.remove('speaking');
+        if (onDone) onDone();
+      };
+
+      utter.onerror = () => {
+        clearInterval(keepAlive);
+        if (btnEl) btnEl.classList.remove('speaking');
+        if (onDone) onDone();
+      };
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    // ====== SYSTEM PROMPT (NATURAL MAINLAND SPOKEN CHINESE) ======
+    function buildSystemPrompt() {
+      return `Bạn là Lâm Hiểu (林晓), một người bạn trẻ bản xứ Trung Quốc (sống tại Thượng Hải/Bắc Kinh), đang nói chuyện điện thoại trực tiếp với người dùng Việt Nam để giúp họ luyện phản xạ giao tiếp tiếng Trung tự nhiên.
+
+CHỦ ĐỀ HIỆN TẠI: ${state.topic}
+
+QUY TẮC BẮT BUỘC ĐỂ GIỐNG NGƯỜI BẢN ĐỊA THẬT:
+1. Nói khẩu ngữ đời thường (口语) như người Trung Quốc nói chuyện ngoài đời thật, TUYỆT ĐỐI không dùng văn viết sách giáo khoa cứng nhắc.
+2. Dùng tự nhiên các trợ từ ngữ khí cuối câu (啊, 呀, 呢, 吧, 嘛, 哈, 哦, 呐) và từ đệm khẩu ngữ (那个, 就是说, 其实吧, 说实话, 挺好的, 还行, 怎么说呢, 哎呀).
+3. Mỗi lượt chỉ nói ngắn gọn 1 đến 3 câu tự nhiên (khoảng 15-45 chữ Hán) để tốc độ phản hồi siêu nhanh như gọi điện thật, và luôn kết thúc bằng một câu hỏi mở tự nhiên để người dùng dễ trả lời tiếp.
+4. Nếu người dùng nhắn tiếng Việt hoặc nói tiếng Trung bị sai ngữ pháp/ngượng, hãy nhẹ nhàng sửa ở dòng [FIX], còn ở dòng [CN] vẫn tiếp tục mạch trò chuyện tự nhiên.
+
+ĐỊNH DẠNG TRẢ LỜI BẮT BUỘC (Đúng 4 dòng, không thêm markdown thừa, không giải thích ngoài lề):
+[CN] Câu trả lời tiếng Trung giản thể tự nhiên
+[PY] Phiên âm Pinyin có dấu thanh điệu đầy đủ
+[VI] Nghĩa tiếng Việt tự nhiên sát ngữ cảnh
+[FIX] Nếu câu của người dùng có lỗi sai hoặc chưa tự nhiên, viết ngắn gọn bằng tiếng Việt: "Tự nhiên hơn: [Chữ Hán] ([Pinyin]) - [Giải thích 1 câu]". Nếu câu của người dùng đã ổn hoặc chỉ chào hỏi, viết đúng chữ: OK`;
+    }
+
+    // ====== GEMINI STREAMING ENGINE (SUB-SECOND RESPONSE) ======
+    const MODEL_FALLBACKS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-2.5-flash'];
+
+    async function streamGeminiReply(userText, aiBubbleRefs) {
+      if (!state.apiKey) {
+        openSettings();
+        throw new Error('Vui lòng nhập Google Gemini API Key trong Cài đặt.');
+      }
+
+      state.history.push({ role: 'user', parts: [{ text: userText }] });
+      if (state.history.length > 16) {
+        state.history = state.history.slice(-16);
+      }
+
+      const payload = {
+        systemInstruction: { parts: [{ text: buildSystemPrompt() }] },
+        contents: state.history,
+        generationConfig: {
+          temperature: 0.85,
+          maxOutputTokens: 320,
+          thinkingConfig: { thinkingLevel: 'low' }
+        }
+      };
+
+      let response = null;
+      let usedModel = state.activeModel;
+
+      // Try active model first, fallback seamlessly if needed
+      const tryModels = [usedModel, ...MODEL_FALLBACKS.filter(m => m !== usedModel)];
+      for (const model of tryModels) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': state.apiKey.trim()
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          response = res;
+          if (state.activeModel !== model) {
+            state.activeModel = model;
+            saveState();
+          }
+          break;
+        } else if (res.status === 404) {
+          continue;
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          const msg = errData?.error?.message || `Lỗi API (${res.status})`;
+          throw new Error(msg);
+        }
+      }
+
+      if (!response) {
+        throw new Error('Không kết nối được model Gemini. Hãy kiểm tra lại API Key.');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let sseBuffer = '';
+      let fullText = '';
+      let spokenStarted = false;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        sseBuffer += decoder.decode(value, { stream: true });
+        const lines = sseBuffer.split('\n');
+        sseBuffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr || jsonStr === '[DONE]') continue;
+
+          try {
+            const chunk = JSON.parse(jsonStr);
+            const delta = chunk?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (delta) {
+              fullText += delta;
+              const parsed = parseProtocol(fullText);
+              updateAIBubble(aiBubbleRefs, parsed);
+
+              // Trigger speech the instant the [CN] line completes!
+              if (!spokenStarted && parsed.cnComplete && parsed.cn) {
+                spokenStarted = true;
+                speakChinese(parsed.cn, aiBubbleRefs.playBtn, () => {
+                  if (state.autoCall && !state.isRecording) {
+                    setTimeout(() => startSpeechRecognition(), 350);
+                  }
+                });
+              }
+            }
+          } catch (e) {}
+        }
+      }
+
+      const finalParsed = parseProtocol(fullText);
+      updateAIBubble(aiBubbleRefs, finalParsed, true);
+
+      if (!spokenStarted && finalParsed.cn) {
+        speakChinese(finalParsed.cn, aiBubbleRefs.playBtn, () => {
+          if (state.autoCall && !state.isRecording) {
+            setTimeout(() => startSpeechRecognition(), 350);
+          }
+        });
+      }
+
+      state.history.push({ role: 'model', parts: [{ text: fullText }] });
+      saveState();
+    }
+
+    function parseProtocol(raw) {
+      const cnMatch = raw.match(/\[CN\]\s*([^\n]*)/);
+      const pyMatch = raw.match(/\[PY\]\s*([^\n]*)/);
+      const viMatch = raw.match(/\[VI\]\s*([^\n]*)/);
+      const fixMatch = raw.match(/\[FIX\]\s*([\s\S]*)$/);
+
+      const cn = cnMatch ? cnMatch[1].trim() : '';
+      const cnComplete = /\[CN\]\s*[^\n]+\n/.test(raw);
+      const py = pyMatch ? pyMatch[1].trim() : '';
+      const vi = viMatch ? viMatch[1].trim() : '';
+      let fix = fixMatch ? fixMatch[1].trim() : '';
+      if (fix.toUpperCase() === 'OK' || fix.toUpperCase().startsWith('OK')) fix = '';
+
+      // Fallback if model didn't use tags
+      const fallbackCn = !cn && !py && !vi ? raw.trim() : cn;
+      return { cn: fallbackCn, cnComplete, py, vi, fix };
+    }
+
+    // ====== UI RENDERING ======
+    function addUserMessage(text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg user';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+      chatEl.appendChild(wrap);
+      scrollToBottom();
+    }
+
+    function createAIBubble() {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg ai';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+
+      const cnEl = document.createElement('div');
+      cnEl.className = 'cn-text';
+      cnEl.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+
+      const pyEl = document.createElement('div');
+      pyEl.className = 'py-text';
+
+      const viEl = document.createElement('div');
+      viEl.className = 'vi-text';
+
+      const actions = document.createElement('div');
+      actions.className = 'msg-actions';
+      actions.style.display = 'none';
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'mini-btn';
+      playBtn.innerHTML = '🔊 Nghe lại';
+
+      const slowBtn = document.createElement('button');
+      slowBtn.className = 'mini-btn';
+      slowBtn.innerHTML = '🐢 Chậm';
+
+      actions.appendChild(playBtn);
+      actions.appendChild(slowBtn);
+
+      bubble.appendChild(cnEl);
+      bubble.appendChild(pyEl);
+      bubble.appendChild(viEl);
+      bubble.appendChild(actions);
+      wrap.appendChild(bubble);
+
+      const coachEl = document.createElement('div');
+      coachEl.className = 'coach-tip';
+      coachEl.style.display = 'none';
+      wrap.appendChild(coachEl);
+
+      chatEl.appendChild(wrap);
+      scrollToBottom();
+
+      return { wrap, cnEl, pyEl, viEl, actions, playBtn, slowBtn, coachEl };
+    }
+
+    function updateAIBubble(refs, data, isDone = false) {
+      if (data.cn) {
+        refs.cnEl.textContent = data.cn;
+        refs.actions.style.display = 'flex';
+        refs.playBtn.onclick = () => speakChinese(data.cn, refs.playBtn);
+        refs.slowBtn.onclick = () => {
+          const prevRate = state.rate;
+          state.rate = 0.72;
+          speakChinese(data.cn, refs.slowBtn, () => { state.rate = prevRate; });
+        };
+      }
+      if (data.py) refs.pyEl.textContent = data.py;
+      if (data.vi) refs.viEl.textContent = data.vi;
+      if (isDone && data.fix) {
+        refs.coachEl.style.display = 'block';
+        refs.coachEl.textContent = '💡 ' + data.fix;
+      }
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    async function handleSend(rawText) {
+      const text = (rawText || '').trim();
+      if (!text || state.isGenerating) return;
+
+      suggestionsBox.classList.remove('show');
+      textInput.value = '';
+      updateSendMicToggle();
+      addUserMessage(text);
+
+      state.isGenerating = true;
+      const refs = createAIBubble();
+
+      try {
+        await streamGeminiReply(text, refs);
+      } catch (err) {
+        refs.cnEl.textContent = '⚠️ ' + err.message;
+        refs.cnEl.style.color = '#fca5a5';
+        refs.cnEl.style.fontSize = '14px';
+      } finally {
+        state.isGenerating = false;
+      }
+    }
+
+    // ====== SUGGESTIONS GENERATOR ======
+    sugBtn.addEventListener('click', async () => {
+      if (suggestionsBox.classList.contains('show')) {
+        suggestionsBox.classList.remove('show');
+        return;
+      }
+      if (!state.apiKey) {
+        openSettings();
+        return;
+      }
+
+      suggestionsBox.innerHTML = '<div style="font-size:12px;color:#94a3b8;padding:4px;">✨ Đang tạo 3 gợi ý trả lời tự nhiên...</div>';
+      suggestionsBox.classList.add('show');
+
+      try {
+        const lastAI = [...state.history].reverse().find(m => m.role === 'model')?.parts?.[0]?.text || '你好呀！最近忙不忙？';
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${state.activeModel}:generateContent`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': state.apiKey.trim()
+          },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [{
+                text: `Dựa trên câu vừa nói của người Trung Quốc: "${lastAI}". Hãy gợi ý đúng 3 câu trả lời tiếng Trung khẩu ngữ tự nhiên cho người học. Mỗi gợi ý 1 dòng đúng định dạng: Chữ Hán | Pinyin | Nghĩa tiếng Việt. Không viết gì thêm.`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 200,
+              thinkingConfig: { thinkingLevel: 'low' }
+            }
+          })
+        });
+
+        const data = await res.json();
+        const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const items = raw.split('\n').map(l => l.trim()).filter(l => l.includes('|')).slice(0, 3);
+
+        if (items.length === 0) throw new Error('Không tạo được gợi ý');
+
+        suggestionsBox.innerHTML = '';
+        items.forEach(line => {
+          const [cn, py, vi] = line.split('|').map(s => s.trim());
+          const btn = document.createElement('button');
+          btn.className = 'sug-item';
+          btn.innerHTML = `<div class="sug-cn">${cn}</div><div class="sug-sub">${py || ''} • ${vi || ''}</div>`;
+          btn.onclick = () => handleSend(cn);
+          suggestionsBox.appendChild(btn);
+        });
+      } catch (e) {
+        suggestionsBox.innerHTML = `<div style="font-size:12px;color:#fca5a5;">Lỗi: ${e.message}</div>`;
+      }
+    });
+
+    // ====== iOS SAFARI SPEECH RECOGNITION ======
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let finalTranscript = '';
+
+    function startSpeechRecognition() {
+      unlockIOSAudio();
+      window.speechSynthesis.cancel();
+
+      if (!SpeechRec) {
+        textInput.focus();
+        alert('Trình duyệt này chưa hỗ trợ nút Micro trực tiếp. Bạn hãy bấm vào ô nhập chữ bên dưới rồi bấm biểu tượng Micro 🎙️ trên bàn phím iPhone nhé — nhận diện siêu chuẩn!');
+        return;
+      }
+
+      if (state.isRecording && recognition) {
+        recognition.stop();
+        return;
+      }
+
+      try {
+        recognition = new SpeechRec();
+        recognition.lang = 'zh-CN';
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        finalTranscript = '';
+
+        recognition.onstart = () => {
+          state.isRecording = true;
+          micBtn.classList.add('recording');
+          liveBanner.classList.add('show');
+          liveText.textContent = '🎙️ Mời bạn nói tiếng Trung...';
+        };
+
+        recognition.onresult = (event) => {
+          let interim = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const t = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += t;
+            } else {
+              interim += t;
+            }
+          }
+          liveText.textContent = '🗣️ ' + (finalTranscript || interim || 'Đang nghe...');
+        };
+
+        recognition.onerror = (event) => {
+          state.isRecording = false;
+          micBtn.classList.remove('recording');
+          liveBanner.classList.remove('show');
+          if (event.error === 'not-allowed') {
+            alert('Safari chưa được cấp quyền Micro. Hãy vào Cài đặt iPhone → Safari → Micro → Cho phép, hoặc dùng nút Micro trên bàn phím iPhone.');
+          }
+        };
+
+        recognition.onend = () => {
+          state.isRecording = false;
+          micBtn.classList.remove('recording');
+          liveBanner.classList.remove('show');
+          const spoken = finalTranscript.trim();
+          if (spoken) {
+            handleSend(spoken);
+          }
+        };
+
+        recognition.start();
+      } catch (e) {
+        state.isRecording = false;
+        micBtn.classList.remove('recording');
+        liveBanner.classList.remove('show');
+        textInput.focus();
+      }
+    }
+
+    micBtn.addEventListener('click', startSpeechRecognition);
+    stopMicBtn.addEventListener('click', () => {
+      if (recognition && state.isRecording) recognition.stop();
+    });
+
+    // ====== INPUT & TOOLBAR EVENTS ======
+    function updateSendMicToggle() {
+      const hasText = textInput.value.trim().length > 0;
+      sendBtn.style.display = hasText ? 'flex' : 'none';
+      micBtn.style.display = hasText ? 'none' : 'flex';
+    }
+
+    textInput.addEventListener('input', updateSendMicToggle);
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSend(textInput.value);
+      }
+    });
+    sendBtn.addEventListener('click', () => handleSend(textInput.value));
+
+    const togglePyBtn = document.getElementById('toggle-py');
+    const toggleViBtn = document.getElementById('toggle-vi');
+    const toggleCallBtn = document.getElementById('toggle-call');
+
+    function applyToggles() {
+      appRoot.classList.toggle('hide-py', !state.showPy);
+      appRoot.classList.toggle('hide-vi', !state.showVi);
+      togglePyBtn.classList.toggle('on', state.showPy);
+      toggleViBtn.classList.toggle('on', state.showVi);
+      toggleCallBtn.classList.toggle('call-on', state.autoCall);
+      topicSelect.value = state.topic;
+    }
+
+    togglePyBtn.addEventListener('click', () => {
+      state.showPy = !state.showPy;
+      applyToggles();
+      saveState();
+    });
+
+    toggleViBtn.addEventListener('click', () => {
+      state.showVi = !state.showVi;
+      applyToggles();
+      saveState();
+    });
+
+    toggleCallBtn.addEventListener('click', () => {
+      state.autoCall = !state.autoCall;
+      applyToggles();
+      saveState();
+    });
+
+    topicSelect.addEventListener('change', () => {
+      state.topic = topicSelect.value;
+      saveState();
+      startFreshConversation();
+    });
+
+    // ====== SETTINGS MODAL ======
+    function openSettings() {
+      loadChineseVoices();
+      apiKeyInput.value = state.apiKey || '';
+      rateSelect.value = String(state.rate || 0.98);
+      if (state.voiceURI) voiceSelect.value = state.voiceURI;
+      settingsModal.classList.add('show');
+    }
+
+    document.getElementById('settings-btn').addEventListener('click', openSettings);
+    document.getElementById('close-settings-btn').addEventListener('click', () => {
+      settingsModal.classList.remove('show');
+    });
+
+    document.getElementById('save-settings-btn').addEventListener('click', () => {
+      state.apiKey = apiKeyInput.value.trim();
+      state.voiceURI = voiceSelect.value;
+      state.rate = parseFloat(rateSelect.value) || 0.98;
+      saveState();
+      loadChineseVoices();
+      settingsModal.classList.remove('show');
+      if (state.history.length === 0) {
+        startFreshConversation();
+      }
+    });
+
+    document.getElementById('test-voice-btn').addEventListener('click', () => {
+      state.voiceURI = voiceSelect.value;
+      state.rate = parseFloat(rateSelect.value) || 0.98;
+      speakChinese('嗨，你好呀！我是林晓，今天想聊点什么呢？');
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', startFreshConversation);
+
+    function startFreshConversation() {
+      window.speechSynthesis.cancel();
+      state.history = [];
+      chatEl.innerHTML = '';
+      suggestionsBox.classList.remove('show');
+
+      const welcome = {
+        cn: '嗨！你好呀，今天过得怎么样？想跟我聊点什么呢？',
+        py: 'Hāi! Nǐ hǎo ya, jīntiān guò de zěnmeyàng? Xiǎng gēn wǒ liáo diǎn shénme ne?',
+        vi: 'Chào bạn nha! Hôm nay của bạn thế nào? Muốn nói chuyện gì với mình nào?'
+      };
+
+      const refs = createAIBubble();
+      updateAIBubble(refs, welcome, true);
+      state.history.push({
+        role: 'model',
+        parts: [{ text: `[CN] ${welcome.cn}\n[PY] ${welcome.py}\n[VI] ${welcome.vi}\n[FIX] OK` }]
+      });
+    }
+
+    // ====== INIT ======
+    applyToggles();
+    startFreshConversation();
+    if (!state.apiKey) {
+      setTimeout(openSettings, 400);
+    }
+  </script>
+</body>
+</html>
